@@ -1,8 +1,0 @@
-galaxy_info:
-  author: c0lin
-  description: base role for development-vm's
-  company: i18n, populate apt-cache, overwrite hosts
-  license: license (GPLv2, CC-BY, etc)
-  min_ansible_version: 2.0
-  galaxy_tags: []
-dependencies: []

@@ -1,5 +1,0 @@
----
-- include_tasks: copy-ssh-key.yml
-- include_tasks: hosts.yml
-- include_tasks: locale.yml
-- include_tasks: apt-update.yml

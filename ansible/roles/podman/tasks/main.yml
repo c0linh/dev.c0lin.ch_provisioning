@@ -1,4 +1,0 @@
----
-
-- include_tasks: setup-podman.yml
-- include_tasks: start-proxy.yml

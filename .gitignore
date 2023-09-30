@@ -1,19 +1,6 @@
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-/out/
-
 # IDE - VSCode
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
-
-
-.vagrant
-.ansible
-.ssh
-package.box

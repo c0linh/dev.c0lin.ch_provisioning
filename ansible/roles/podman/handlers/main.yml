@@ -1,6 +1,0 @@
----
-# handlers file for base
-- name: reset directory perms
-  shell: restorecon -Rv {{item}}
-  with_items:
-    - "{{ base_selinux_restore_contexts }}"
