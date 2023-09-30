@@ -1,0 +1,8 @@
+- name: Copy private key
+  ansible.builtin.copy:
+    src: /vagrant/.ssh/id_ed25519
+    dest: /home/vagrant/.ssh/id_ed25519
+    owner: vagrant
+    group: vagrant
+    mode: '0600'
+

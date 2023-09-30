@@ -1,0 +1,11 @@
+---
+- name: Mediacenter Hosts
+  hosts: 
+  - mediacenter
+  vars_files: 
+    - "env_vars/{{ env }}.yml"
+  roles:
+    - base
+    - mediacenter
+    - podman
+  become: yes
