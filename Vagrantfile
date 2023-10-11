@@ -27,15 +27,11 @@ Vagrant.configure("2") do |config|
   config.vm.provision "ansible" do |ansible|
     ansible.galaxy_role_file = "provisioning/requirements.yml"
     ansible.playbook = "provisioning/playbook.yml"
-    ansible.verbose = "-vvv"
+    #ansible.verbose = "-vv"
     # ansible.host_vars = {
-    #   "dev" => {}
     # }
-    # ansible.groups = {
-    #   "group1" => ["dev"],
-    #   "all_groups:children" => ["group1"],
-    #   "group1:vars" => {"variable1" => 9,
-    #                     "variable2" => "example"}
-    # }  
+    ansible.groups = {
+      "all:vars" => { "env" => "dev" }
+    }
   end
 end
