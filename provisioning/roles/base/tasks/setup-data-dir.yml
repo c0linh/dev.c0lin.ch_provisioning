@@ -1,0 +1,42 @@
+- name: Create data group
+  ansible.builtin.group:
+    name: data
+    gid: 99
+    state: present
+
+- name: Create data user
+  ansible.builtin.user:
+    name: data
+    group: data
+    uid: 99
+    system: true
+    shell: /usr/sbin/nologin
+
+- name: Create data directory
+  ansible.builtin.file:
+    path: /data
+    state: directory
+    owner: data
+    group: data
+    mode: "2775"
+
+- name: Install ACL
+  ansible.builtin.apt:
+    pkg: acl
+
+- name: set ACL data-group permissions to rw 
+  ansible.posix.acl:
+    path: /data/
+    etype: group
+    entity: data
+    permissions: rw
+    default: true
+    state: present
+
+# - name: Mount data partition
+#   mount:
+#     path: /data
+#     src: LABEL=DATA
+#     fstype: ntfs
+#     opts: rw,big_writes,uid=99,gid=99,dmask=0007,fmask=0117
+#     state: mounted

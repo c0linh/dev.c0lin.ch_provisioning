@@ -1,0 +1,52 @@
+- name: Create registry directory
+  ansible.builtin.file:
+    path: /home/podman/.local/share/registry
+    state: directory
+    owner: podman
+    group: podman
+    mode: "644"
+
+- name: Configure local registry
+  ansible.builtin.copy:
+    dest: "/etc/containers/registries.conf.d/local-registry.conf"
+    mode: "0644"
+    content: |
+      [[registry]]
+      location = "localhost:5000"
+      prefix = "c0lin.ch"
+      insecure = true
+  notify: Restart podman
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Create registry pod
+  become_user: podman
+  become: true
+  containers.podman.podman_container:
+    debug: true
+    name: registry
+    image: registry
+    state: present
+    group_add: keep-groups
+    userns: keep-id
+    ports:
+      - "5000:5000"
+    volume:
+      - /home/podman/.local/share/registry:/var/bin/registry
+    generate_systemd:
+      path: "/home/podman/.config/systemd/user"
+      restart_policy: always
+      names: true
+
+- name: Enable and start registry container service
+  become_user: "podman"
+  become: true
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/1001"
+  ansible.builtin.systemd:
+    name: "container-registry"
+    scope: "user"
+    state: started
+    daemon_reload: "{{ systemd_daemon_reload }}"
+    enabled: true

@@ -1,0 +1,35 @@
+- name: Set default locale to english
+  ansible.builtin.lineinfile:
+    path: /etc/default/locale
+    regexp: '^LANG='
+    line: LANG=en_US.UTF-8
+
+- name: Set English and swiss-german in locale.gen
+  ansible.builtin.copy:
+    dest: "/etc/locale.gen"
+    mode: "0644"
+    content: |
+      en_US.UTF-8 UTF-8
+      de_CH.UTF-8 UTF-8
+  notify: Generate locales
+
+- name: Install keyboard related packages
+  ansible.builtin.apt:
+    pkg:
+      - keyboard-configuration
+      - console-setup
+
+- name: Set keyboard layout to swiss-german
+  ansible.builtin.copy:
+    dest: "/etc/default/keyboard"
+    mode: "0644"
+    content: |
+      XKBMODEL="pc105"
+      XKBLAYOUT="ch"
+      XKBVARIANT=""
+      XKBOPTIONS="ctrl:nocaps,terminate:ctrl_alt_bksp"
+      BACKSPACE="guess"
+  notify: Restart keyboard service
+
+- name: Flush handlers
+  meta: flush_handlers

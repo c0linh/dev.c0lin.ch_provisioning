@@ -1,0 +1,54 @@
+- name: Install podman and dependencies for rootless usage
+  ansible.builtin.apt:
+    pkg:
+      - fuse-overlayfs
+      - slirp4netns
+      - uidmap
+      - podman
+
+# - name: Configure containter registrie to search docker.io
+#   ansible.builtin.copy:
+#     dest: "/etc/containers/registries.conf.d/registries.conf"
+#     mode: "0644"
+#     content: |
+#       unqualified-search-registries = ['docker.io']
+
+- name: Set podman's storage driver to fuse-overlayfs
+  ansible.builtin.copy:
+    dest: "/etc/containers/storage.conf"
+    mode: "0644"
+    content: |
+      [storage]
+        driver = "overlay"
+      [storage.options.overlay]
+        mount_program = "/usr/bin/fuse-overlayfs"
+
+- name: Create the podman user
+  ansible.builtin.user:
+    name: podman
+    groups: data
+    shell: /usr/sbin/nologin
+
+- name: Check if user is lingering
+  stat:
+    path: "/var/lib/systemd/linger/podman"
+  register: user_lingering
+
+- name: Enable lingering if needed
+  command: "loginctl enable-linger podman"
+  when:
+    - not user_lingering.stat.exists
+
+- name: Add subuid for podman user
+  ansible.builtin.copy:
+    dest: /etc/subuid
+    mode: "0644"
+    content: podman:65601536:65536
+
+- name: Add subgid and data group for podman user
+  ansible.builtin.copy:
+    dest: /etc/subgid
+    mode: "0644"
+    content: |
+      podman:65601536:65536
+      podman:99:1

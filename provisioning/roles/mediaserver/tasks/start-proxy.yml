@@ -1,0 +1,43 @@
+- name: Install git
+  ansible.builtin.apt:
+    pkg:
+      - git
+
+- name: Clone content and config
+  ansible.builtin.git:
+    repo: https://github.com/c0linh/nginx-proxy.git
+    dest: /home/podman/container/nginx-proxy
+    clone: true
+    update: true
+
+- name: Start nginx proxy
+  become_user: "podman"
+  become: true
+  containers.podman.podman_container:
+    name: nginx-proxy
+    image: nginx:alpine-slim
+    state: present
+    group_add: keep-groups
+    userns: keep-id
+    volume:
+      - /home/podman/container/nginx-proxy/static:/usr/share/nginx/html
+      - /home/podman/container/nginx-proxy/proxy.conf:/etc/nginx/conf.d/default.conf
+      - /home/podman/container/nginx-proxy/.htaccess:/usr/share/nginx/.htaccess
+    ports:
+      - "8080:80"
+    generate_systemd:
+      path: "/home/podman/.config/systemd/user"
+      restart_policy: always
+      names: true
+
+- name: enable and start service for nginx-proxy container 
+  become_user: "podman"
+  become: true
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/1001"
+  systemd:
+    name: "container-nginx-proxy"
+    scope: "user"
+    daemon_reload: "{{ systemd_daemon_reload }}"
+    state: started
+    enabled: true

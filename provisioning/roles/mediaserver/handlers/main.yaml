@@ -1,0 +1,6 @@
+- name: Restart podman
+  become: true
+  systemd:
+    name: "podman"
+    state: restarted
+    enabled: true

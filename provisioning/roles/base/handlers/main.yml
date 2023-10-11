@@ -1,0 +1,5 @@
+- name: Generate locales
+  ansible.builtin.shell: locale-gen
+
+- name: Restart keyboard service
+  ansible.builtin.shell: service keyboard-setup restart

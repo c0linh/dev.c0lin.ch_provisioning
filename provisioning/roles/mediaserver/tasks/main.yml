@@ -1,0 +1,5 @@
+- ansible.builtin.import_tasks: setup-podman.yml
+- ansible.builtin.import_tasks: podman-registry.yml
+# - ansible.builtin.import_tasks: start-hello-world-pod.yml
+# - ansible.builtin.import_tasks: start-vol-pod.yml
+#- ansible.builtin.import_tasks: start-proxy.yml

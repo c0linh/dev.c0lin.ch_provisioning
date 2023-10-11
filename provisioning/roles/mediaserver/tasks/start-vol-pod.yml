@@ -1,0 +1,29 @@
+- name: Create busybox pod
+  become_user: podman
+  become: true
+  containers.podman.podman_container:
+    debug: true
+    name: bb
+    image: busybox
+    state: present
+    group_add: keep-groups
+    userns: keep-id
+    volume:
+      - /data:/data
+    command: mkdir /data/lala && touch /data/lala/test
+    generate_systemd:
+      path: "/home/podman/.config/systemd/user"
+      restart_policy: always
+      names: true
+
+- name: Enable and start service for container bb
+  become_user: "podman"
+  become: true
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/1001"
+  systemd:
+    name: "container-bb"
+    scope: "user"
+    daemon_reload: "{{ systemd_daemon_reload }}"
+    state: started
+    enabled: true
