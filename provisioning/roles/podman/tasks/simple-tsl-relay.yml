@@ -1,0 +1,88 @@
+- name: Install dependencies for ansible openssl_certificate
+  ansible.builtin.apt:
+    pkg:
+      - python3-openssl
+
+- name: Create proxy data directory
+  ansible.builtin.file:
+    path: "{{ container_data_dir }}/proxy"
+    state: directory
+    owner: "podman"
+    group: "podman"
+    mode: "0755"
+
+- name: Create private key (RSA, 4096 bits)
+  community.crypto.openssl_privatekey:
+    path: "{{ container_data_dir }}/proxy/cert.key"
+    owner: "podman"
+    group: "podman"
+    mode: "0640"
+
+- name: Generate an OpenSSL Certificate Signing Request with subjectAltName extension
+  community.crypto.openssl_csr:
+    path: '{{ container_data_dir }}/proxy/cert.csr'
+    privatekey_path: "{{ container_data_dir }}/proxy/cert.key"
+    common_name: '{{ hostname }}'
+    subject_alt_name: 'DNS:{{ hostname }}'
+
+#it seems like "openssl_certificate" does not support become_user
+#workaround with 777
+- name: Generate a Self Signed OpenSSL certificate
+  community.crypto.x509_certificate:
+    path: "{{ container_data_dir }}/proxy/cert.pem"
+    privatekey_path: "{{ container_data_dir }}/proxy/cert.key"
+    csr_path: "{{ container_data_dir }}/proxy/cert.csr"
+    provider: selfsigned
+
+    owner: "podman"
+    group: "podman"
+
+- name: Write nginx tsl relay proxy conf
+  ansible.builtin.copy:
+    dest: "{{ container_data_dir }}/proxy/nginx.conf"
+    mode: "0644"
+    owner: "podman"
+    group: "podman"
+    content: |
+      client_max_body_size 0;
+
+      server {
+        listen 5443 ssl;
+        ssl_certificate /tmp/cert/cert.pem;
+        ssl_certificate_key /tmp/cert/cert.key;
+        location / {
+          proxy_pass http://{{ hostname }}:5000;
+        }
+      }
+
+- name: Start nginx proxy
+  #needs acl package
+  become_user: "podman"
+  become: true
+  containers.podman.podman_container:
+    name: nginx-proxy
+    image: nginxinc/nginx-unprivileged
+    state: present
+    group_add: keep-groups
+    userns: keep-id
+    volume:
+      - "{{ container_data_dir }}/proxy/nginx.conf:/etc/nginx/conf.d/nginx.conf"
+      - "{{ container_data_dir }}/proxy:/tmp/cert"
+    ports:
+      - "5443:5443"
+    generate_systemd:
+      path: "/home/podman/.config/systemd/user"
+      restart_policy: always
+      names: true
+
+- name: Enable and start service for nginx-proxy container 
+  become_user: "podman"
+  become: true
+  environment:
+    XDG_RUNTIME_DIR: "/run/user/1001"
+  systemd:
+    name: "container-nginx-proxy"
+    scope: "user"
+    daemon_reload: "{{ systemd_daemon_reload }}"
+    state: started
+    enabled: true

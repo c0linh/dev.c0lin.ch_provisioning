@@ -5,13 +5,14 @@
       - slirp4netns
       - uidmap
       - podman
+      - acl
 
-# - name: Configure containter registrie to search docker.io
-#   ansible.builtin.copy:
-#     dest: "/etc/containers/registries.conf.d/registries.conf"
-#     mode: "0644"
-#     content: |
-#       unqualified-search-registries = ['docker.io']
+- name: Configure containter registrie to search docker.io
+  ansible.builtin.copy:
+    dest: "/etc/containers/registries.conf.d/registries.conf"
+    mode: "0644"
+    content: |
+      unqualified-search-registries = ['docker.io']
 
 - name: Set podman's storage driver to fuse-overlayfs
   ansible.builtin.copy:
@@ -26,7 +27,6 @@
 - name: Create the podman user
   ansible.builtin.user:
     name: podman
-    groups: data
     shell: /usr/sbin/nologin
 
 - name: Check if user is lingering
@@ -52,3 +52,11 @@
     content: |
       podman:65601536:65536
       podman:99:1
+
+- name: Create container-host data directory
+  ansible.builtin.file:
+    path: "{{ container_data_dir }}"
+    state: directory
+    owner: podman
+    group: podman
+    mode: "0755"

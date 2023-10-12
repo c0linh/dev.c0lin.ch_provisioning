@@ -40,3 +40,16 @@
 #     fstype: ntfs
 #     opts: rw,big_writes,uid=99,gid=99,dmask=0007,fmask=0117
 #     state: mounted
+
+#allow podman user to read/write data dir
+- name: Add data group for podman
+  ansible.builtin.user:
+    name: podman
+    groups: data
+    append: yes
+
+- name: Add data subgid for podman
+  ansible.builtin.lineinfile:
+    path: /etc/subgid
+    regexp: "^podman:99:1"
+    line: "podman:99:1"

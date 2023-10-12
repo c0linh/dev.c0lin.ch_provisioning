@@ -1,1 +1,3 @@
-systemd_daemon_reload: true
+systemd_daemon_reload: false
+hostname: "mediacenter.local"
+container_data_dir: "/home/podman/container-data"

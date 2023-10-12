@@ -21,14 +21,14 @@ Vagrant.configure("2") do |config|
   end
 
   config.vm.define "dev" do |dev|
-    dev.vm.hostname = "mediacenter"
+    dev.vm.hostname = "mediacenter.local"
   end
 
   config.vm.provision "ansible" do |ansible|
     ansible.galaxy_roles_path = ".vagrant/galaxy-roles"
     ansible.galaxy_role_file = "provisioning/requirements.yml"
     ansible.playbook = "provisioning/playbook.yml"
-    # ansible.verbose = "-vvv"
+    #ansible.verbose = "-vvv"
     # ansible.host_vars = {
     # }
     ansible.groups = {
