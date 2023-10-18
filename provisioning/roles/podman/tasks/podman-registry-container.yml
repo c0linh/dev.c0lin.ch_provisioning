@@ -1,0 +1,33 @@
+
+- name: Create registry directory
+  ansible.builtin.file:
+    path: /home/podman/registry
+    state: directory
+    owner: podman
+    group: podman
+    mode: "0755"
+
+- name: Configure hosts to use local registry
+  ansible.builtin.copy:
+    dest: "/etc/containers/registries.conf.d/local-registry.conf"
+    mode: "0644"
+    content: |
+      [[registry]]
+      location = "{{ hostname }}"
+      insecure = true
+  notify: Restart podman
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- name: Create registry container
+  become_user: podman
+  become: true
+  containers.podman.podman_container:
+    name: registry
+    pod: webserver
+    image: registry:2
+    state: started
+    restart_policy: always
+    volume:
+      - /home/podman/registry:/var/lib/registry

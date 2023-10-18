@@ -1,3 +1,2 @@
 roles:
  - name: hifis.unattended_upgrades
-   version: v3.2.0

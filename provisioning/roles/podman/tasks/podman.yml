@@ -4,8 +4,8 @@
       - fuse-overlayfs
       - slirp4netns
       - uidmap
-      - podman
       - acl
+      - podman
 
 - name: Configure containter registrie to search docker.io
   ansible.builtin.copy:
@@ -24,7 +24,7 @@
       [storage.options.overlay]
         mount_program = "/usr/bin/fuse-overlayfs"
 
-- name: Create the podman user
+- name: Create podman user
   ansible.builtin.user:
     name: podman
     shell: /usr/sbin/nologin
@@ -51,7 +51,6 @@
     mode: "0644"
     content: |
       podman:65601536:65536
-      podman:99:1
 
 - name: Create container-host data directory
   ansible.builtin.file:

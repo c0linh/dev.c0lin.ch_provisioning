@@ -1,1 +1,3 @@
 systemd_daemon_reload: false
+#may prevent systemd error when try to start pod-services
+podman_recreate_container: true

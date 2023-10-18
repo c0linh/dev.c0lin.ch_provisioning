@@ -1,3 +1,10 @@
+- name: Reload ufw rules
+  become: true
+  systemd:
+    name: "ufw"
+    state: reload
+    enabled: true
+
 - name: Restart podman
   become: true
   systemd:

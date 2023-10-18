@@ -6,9 +6,6 @@ Vagrant.configure("2") do |config|
   config.vm.network "private_network", type: "dhcp"
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
-  config.hostmanager.enabled = true
-  config.hostmanager.manage_guest = true
-
   config.vm.provider :libvirt do |prov|
     prov.cpu_mode="host-passthrough"
     prov.graphics_type="spice"
@@ -20,14 +17,15 @@ Vagrant.configure("2") do |config|
     prov.cpus = 2
   end
 
-  config.vm.define "dev" do |dev|
+  config.vm.define "mediacenter.local" do |dev|
     dev.vm.hostname = "mediacenter.local"
   end
 
-  config.vm.provision "ansible" do |ansible|
+  config.vm.provision "install", type:"ansible" do |ansible|
     ansible.galaxy_roles_path = ".vagrant/galaxy-roles"
     ansible.galaxy_role_file = "provisioning/requirements.yml"
     ansible.playbook = "provisioning/playbook.yml"
+    ansible.tags = "setup"
     #ansible.verbose = "-vvv"
     # ansible.host_vars = {
     # }
@@ -35,4 +33,17 @@ Vagrant.configure("2") do |config|
       "all:vars" => { "env" => "dev" }
     }
   end
+
+  config.vm.provision "podman", type:"ansible" do |ansible|
+    ansible.galaxy_roles_path = ".vagrant/galaxy-roles"
+    ansible.playbook = "provisioning/playbook.yml"
+    ansible.tags = "podman"
+    #ansible.verbose = "-vvv"
+    # ansible.host_vars = {
+    # }
+    ansible.groups = {
+      "all:vars" => { "env" => "dev" }
+    }
+  end
+
 end

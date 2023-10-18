@@ -1,2 +1,4 @@
+#Todo - not a base task. may move to something like "webserver"
 - ansible.builtin.import_tasks: apt-upgrade.yml
 - ansible.builtin.import_tasks: locale-keyboard.yml
+- ansible.builtin.import_tasks: ufw.yml

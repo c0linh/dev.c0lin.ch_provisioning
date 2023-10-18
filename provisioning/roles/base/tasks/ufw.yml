@@ -1,0 +1,21 @@
+- name: Install ufw
+  ansible.builtin.apt:
+    pkg:
+      - ufw
+
+#TODO May restrict?
+- name: Allow SSH
+  community.general.ufw:
+    rule: allow
+    name: OpenSSH
+
+- name: Allow outgoing traffic
+  community.general.ufw:
+    direction: outgoing
+    policy: allow
+
+- name: Enable ufw with default deny policy
+  community.general.ufw:
+    state: enabled
+    policy: deny
+    logging: 'on'
