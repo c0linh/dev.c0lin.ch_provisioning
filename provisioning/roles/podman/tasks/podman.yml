@@ -30,12 +30,12 @@
     shell: /usr/sbin/nologin
 
 - name: Check if user is lingering
-  stat:
+  ansible.builtin.stat:
     path: "/var/lib/systemd/linger/podman"
   register: user_lingering
 
 - name: Enable lingering if needed
-  command: "loginctl enable-linger podman"
+  ansible.builtin.command: "loginctl enable-linger podman"
   when:
     - not user_lingering.stat.exists
 

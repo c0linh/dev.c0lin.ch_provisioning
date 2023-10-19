@@ -34,7 +34,7 @@
   containers.podman.podman_pod:
     name: webserver
     state: created
-    recreate: "{{ podman_recreate_container }}"
+    userns: keep-id
     ports:
       - "8080:8080"
       - "8443:8443"
@@ -52,5 +52,5 @@
     name: "pod-webserver"
     scope: "user"
     state: started
-    daemon_reload: "{{ systemd_daemon_reload }}"
+    daemon_reload: true
     enabled: true

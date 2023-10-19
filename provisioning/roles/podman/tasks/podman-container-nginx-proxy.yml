@@ -54,7 +54,7 @@
     mode: "0644"
     owner: "podman"
     group: "podman"
-      
+
 - name: Create nginx proxy container
   become_user: "podman"
   become: true
@@ -63,8 +63,9 @@
     image: nginxinc/nginx-unprivileged:alpine
     group_add: keep-groups
     pod: webserver
+    recreate: true
     state: started
     restart_policy: always
     volume:
       - "{{ container_data_dir }}/proxy/nginx.conf:/etc/nginx/conf.d/nginx.conf:ro"
-      - "{{ container_data_dir }}/proxy:/tmp/nginx:ro"
+      - "{{ container_data_dir }}/proxy:/tmp/nginx"
