@@ -1,4 +1,2 @@
 - ansible.builtin.import_tasks: podman.yml
-- ansible.builtin.import_tasks: podman-webserver-pod.yml
-- ansible.builtin.import_tasks: podman-container-nginx-proxy.yml
 - ansible.builtin.import_tasks: podman-container-registry.yml
