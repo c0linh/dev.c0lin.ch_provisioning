@@ -30,7 +30,7 @@
       restart_policy: always
       names: true
 
-- name: enable and start service for nginx-proxy container 
+- name: Enable and start service for nginx-proxy container 
   become_user: "podman"
   become: true
   environment:

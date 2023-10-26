@@ -1,40 +1,22 @@
-- name: Mediacenter Hosts
-  hosts:
-    - mediacenter.local
-  # roles:
-  #   - base
-  #   - role: hifis.unattended_upgrades
-  #     unattended_origins_patterns:
-  #       - 'origin=Debian,codename=${distro_codename},label=Debian-Security' # security updates
-  #       - 'o=Debian,codename=${distro_codename},label=Debian' # updates including non-security updates
-  #       - 'o=Debian,codename=${distro_codename},a=proposed-updates'
-  #   - podman
-  #   # - mediaserver
+- name: All machines of home.c0lin.ch
+  hosts: all
+  roles:
+    - base
+    - role: hifis.unattended_upgrades
+      unattended_origins_patterns:
+        - 'origin=Debian,codename=${distro_codename},label=Debian-Security' # security updates
+        - 'o=Debian,codename=${distro_codename},label=Debian' # updates including non-security updates
+        - 'o=Debian,codename=${distro_codename},a=proposed-updates'
+  become: true
 
-  tasks:
-    - name: Setup
-      ansible.builtin.include_role:
-        name: base
-        apply:
-          tags:
-            - setup
-      tags: setup
-    - name: Unattended updates
-      ansible.builtin.include_role:
-        name: hifis.unattended_upgrades
-        apply:
-          tags:
-            - setup
-      tags:
-        - setup
-    - name: Podman
-      ansible.builtin.include_role:
-        name: podman
-        apply:
-          tags:
-            - podman
-      tags:
-        - podman
-  vars_files:
-    - "env_vars/{{ env }}.yml"
+- name: DMZ of home.c0lin.ch
+  hosts: server_vm
+  roles:
+    - podman
+  become: true
+
+- name: Mediacenter
+  hosts: mediacenter
+  roles:
+    - mediacenter
   become: true

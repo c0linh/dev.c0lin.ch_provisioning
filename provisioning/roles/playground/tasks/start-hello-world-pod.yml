@@ -15,7 +15,7 @@
       restart_policy: always
       names: true
 
-- name: enable and start container service
+- name: Enable and start container service
   become_user: "podman"
   become: true
   environment:

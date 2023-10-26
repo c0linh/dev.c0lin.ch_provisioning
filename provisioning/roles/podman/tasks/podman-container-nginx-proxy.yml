@@ -25,8 +25,8 @@
   community.crypto.openssl_csr:
     path: '{{ container_data_dir }}/proxy/cert.csr'
     privatekey_path: "{{ container_data_dir }}/proxy/cert.key"
-    common_name: '{{ hostname }}'
-    subject_alt_name: 'DNS:{{ hostname }}'
+    common_name: '{{ ansible_fqdn }}'
+    subject_alt_name: 'DNS:{{ ansible_fqdn }}'
 
 - name: Generate a Self Signed OpenSSL certificate
   community.crypto.x509_certificate:
@@ -41,7 +41,7 @@
   community.general.htpasswd:
     path: "{{ container_data_dir }}/proxy/registry.htpasswd"
     name: registry
-    password: "{{ lookup('community.general.passwordstore', hostname + '/registry', create=true) }}"
+    password: "{{ lookup('community.general.passwordstore', ansible_fqdn + '/registry', create=true) }}"
     crypt_scheme: bcrypt
     owner: "podman"
     group: "podman"

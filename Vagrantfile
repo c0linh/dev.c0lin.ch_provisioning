@@ -2,8 +2,6 @@
 # vi: set ft=ruby :
 
 Vagrant.configure("2") do |config|
-  config.vm.box = "debian/bookworm64"
-  config.vm.network "private_network", type: "dhcp"
   config.vm.synced_folder ".", "/vagrant", disabled: true
 
   config.vm.provider :libvirt do |prov|
@@ -11,39 +9,28 @@ Vagrant.configure("2") do |config|
     prov.graphics_type="spice"
     prov.video_type="qxl"
     prov.storage_pool_name = "sdb_pool"
-    prov.username = "root"
-    prov.password = ""
-    prov.memory = 2048
-    prov.cpus = 2
+    prov.memory = 8192
+    prov.cpus = 4
   end
 
-  config.vm.define "mediacenter.local" do |dev|
-    dev.vm.hostname = "mediacenter.local"
+  config.vm.define "mediacenter1" do |dev|
+    dev.vm.box = "debian/bookworm64"
+    dev.vm.hostname = "mediacenter"
+    dev.vm.network :private_network, :ip => "192.168.121.74"
   end
 
-  config.vm.provision "install", type:"ansible" do |ansible|
+  config.vm.define "userhome1" do |dev|
+    dev.vm.network :private_network, :ip => "192.168.121.37"
+    dev.vm.box = "debian/bookworm64"
+    dev.vm.hostname = "userhome"
+  end
+
+  config.vm.provision "ansible" do |ansible|
     ansible.galaxy_roles_path = ".vagrant/galaxy-roles"
-    ansible.galaxy_role_file = "provisioning/requirements.yml"
+    ansible.config_file = "provisioning/ansible.cfg"
     ansible.playbook = "provisioning/playbook.yml"
-    ansible.tags = "setup"
-    #ansible.verbose = "-vvv"
-    # ansible.host_vars = {
-    # }
-    ansible.groups = {
-      "all:vars" => { "env" => "dev" }
-    }
+    ansible.inventory_path = "provisioning/environments/dev"
+    ansible.galaxy_role_file = "provisioning/roles/requirements.yml"
+    ansible.limit = "all"
   end
-
-  config.vm.provision "podman", type:"ansible" do |ansible|
-    ansible.galaxy_roles_path = ".vagrant/galaxy-roles"
-    ansible.playbook = "provisioning/playbook.yml"
-    ansible.tags = "podman"
-    #ansible.verbose = "-vvv"
-    # ansible.host_vars = {
-    # }
-    ansible.groups = {
-      "all:vars" => { "env" => "dev" }
-    }
-  end
-
 end

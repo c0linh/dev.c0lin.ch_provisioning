@@ -1,4 +1,7 @@
-#Todo - not a base task. may move to something like "webserver"
+- debug: var=inventory_hostname
+- debug: var=ansible_hostname
+- debug: var=hostvars
+
 - ansible.builtin.import_tasks: apt-upgrade.yml
 - ansible.builtin.import_tasks: locale-keyboard.yml
 - ansible.builtin.import_tasks: ufw.yml

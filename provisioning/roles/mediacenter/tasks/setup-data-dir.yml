@@ -24,7 +24,7 @@
   ansible.builtin.apt:
     pkg: acl
 
-- name: set ACL data-group permissions to rw 
+- name: Set ACL data-group permissions to rw 
   ansible.posix.acl:
     path: /data/
     etype: group

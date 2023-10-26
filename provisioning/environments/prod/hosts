@@ -1,0 +1,20 @@
+#asterix.c0lin.ch ansible_host=0.0.0.0 ansible_user='vagrant' ansible_ssh_private_key_file='/home/c0lin/code/ansible_network/.vagrant/machines/asterix/libvirt/private_key'
+#cartman.c0lin.ch ansible_host=0.0.0.0 ansible_user='vagrant' ansible_ssh_private_key_file='/home/c0lin/code/ansible_network/.vagrant/machines/cartman/libvirt/private_key'
+#dilbert.c0lin.ch ansible_host=0.0.0.0 ansible_user='vagrant' ansible_ssh_private_key_file='/home/c0lin/code/ansible_network/.vagrant/machines/dilbert/libvirt/private_key'
+leonard.c0lin.ch ansible_host=192.168.1.104 ansible_user='vagrant' ansible_ssh_private_key_file='/home/c0lin/code/ansible_network/.vagrant/machines/leonard/libvirt/private_key'
+sheldon.c0lin.ch ansible_host=192.168.1.103 ansible_user='vagrant' ansible_ssh_private_key_file='/home/c0lin/code/ansible_network/.vagrant/machines/sheldon/libvirt/private_key'
+
+[laptop]
+#asterix.c0lin.ch
+
+[desktop]
+#cartman.c0lin.ch
+
+[jumphost]
+#dilbert.c0lin.ch
+
+[userhome]
+leonard.c0lin.ch
+
+[mediacenter]
+sheldon.c0lin.ch

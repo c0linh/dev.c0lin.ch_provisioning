@@ -1,0 +1,17 @@
+mediacenter1 ansible_host=192.168.121.74 ansible_port=22 ansible_user='vagrant' ansible_ssh_private_key_file='/home/c0lin/code/ansible_network/.vagrant/machines/mediacenter/libvirt/private_key'
+userhome1 ansible_host=192.168.121.37 ansible_port=22 ansible_user='vagrant' ansible_ssh_private_key_file='/home/c0lin/code/ansible_network/.vagrant/machines/jumphost/libvirt/private_key'
+
+[userhome]
+userhome1
+
+[mediacenter]
+mediacenter1
+
+[jumphost]
+#jumphost
+
+[laptop]
+#laptop
+
+[desktop]
+#desktop

@@ -1,0 +1,11 @@
+server_vm:
+  children:
+    mediacenter:
+    userhome:
+#jumphost
+
+gui:
+  children:
+    mediacenter:
+#desktop
+#laptop

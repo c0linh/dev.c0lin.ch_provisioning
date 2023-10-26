@@ -2,7 +2,7 @@
   become: true
   systemd:
     name: "ufw"
-    state: reload
+    state: reloaded
     enabled: true
 
 - name: Restart podman

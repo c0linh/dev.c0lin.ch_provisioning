@@ -1,4 +1,0 @@
-systemd_daemon_reload: false
-podman_recreate_container: false
-hostname: "{{ inventory_hostname }}"
-container_data_dir: "/home/podman/container-data"

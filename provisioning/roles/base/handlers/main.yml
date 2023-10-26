@@ -2,6 +2,6 @@
   ansible.builtin.shell: locale-gen
 
 - name: Restart keyboard service
-  systemd:
-    name: " keyboard-setup"
+  ansible.builtin.systemd:
+    name: "keyboard-setup"
     state: restarted
