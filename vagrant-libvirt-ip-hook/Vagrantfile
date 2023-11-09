@@ -1,0 +1,102 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+# Needs qemu-guest-agent on the box
+$ip = "192.168.3.3"
+$gateway = $ip.gsub(/.\d{1,2}$/, ".1")
+$interface = "ens6"
+
+qemu_default_route_add = '{
+  "execute": "guest-exec",
+  "arguments": {
+    "path": "/usr/bin/ip",
+    "arg": [ "route", "add", "default", "via", "'+$gateway+'" ],
+    "capture-output": true
+  }
+}'
+
+qemu_ip = '{
+  "execute": "guest-exec",
+  "arguments": {
+    "path": "/usr/bin/ip",
+    "arg": [ "addr", "add", "'+$ip+'/24", "dev", "'+$interface+'" ],
+    "capture-output": true
+  }
+}'
+
+def qemu_response_request(response) 
+  return '{
+    "execute": "guest-exec-status",
+    "arguments": { "pid": '+JSON.parse(response)['return']['pid'].to_s+' }
+  }'
+end
+
+$network_boot_hostname = "networkBoot"
+
+Vagrant.configure("2") do |config|
+  config.trigger.before :"Vagrant::Action::Builtin::WaitForCommunicator", type: :action do |t|
+    t.info = "Set static ip #{$ip} with gateway #{$gateway} on #{$interface} using qemu-guest-agent - Libvirt::WaitForCommunicator"
+    t.ruby do |env,machine|
+        #  puts "machine provider config instance" + machine.provider_config.instance_variables.join(" ");
+        # puts "env methods: " + env.methods.sort.join(" ")
+        # puts env.machine_names
+        # puts env.machine "networkBoot"
+        # puts "guest.capability: " + env.machine.guest.capability.go_yaml
+
+        driver = machine.provider.driver
+        #networt_xml = driver.connection.client.lookup_network_by_uuid(network_uuid)
+        
+        # def instance_var(obj)
+        #   obj.instance_variables.map {|e| [e, obj.instance_variable_get(e)] }
+        # end
+        
+
+        # driver.list_all_networks.each do |network|
+          
+        #   puts network.pretty_print
+        #   puts instance_var(network.instance_variable_get("@connection"))
+          
+        #   puts "network: " + network.methods.sort.join(" ")
+        #   puts "network instance" + network.instance_variables.sort.join(" ")
+        #   puts "network instance" + network.connection.inspect
+        # end
+
+        # puts driver.list_all_interfaces.to_json
+        # puts driver.host_devices.each.to_json
+        libvirt_domain = driver.send :get_libvirt_domain #private method
+
+        agent_reachable = false
+        until agent_reachable do
+          sleep(2)
+          begin
+            libvirt_domain.qemu_agent_command('{"execute":"guest-ping"}', 3000)
+            agent_reachable = true
+          rescue StandardError => e
+            #noop
+          end
+        end
+
+        #puts qemu_ip
+        response = libvirt_domain.qemu_agent_command(qemu_ip,3000)
+        sleep(1)
+        #ret = libvirt_domain.qemu_agent_command(qemu_response_request(response), 3000)
+        #puts ret
+        #puts qemu_default_route_add
+        response = libvirt_domain.qemu_agent_command(qemu_default_route_add,3000)
+        #sleep(1)
+        #ret = libvirt_domain.qemu_agent_command(qemu_response_request(response), 3000)
+        #puts ret
+    end
+  end
+
+  config.vm.box = "debian12-qemu-ga"
+  config.vm.network :private_network, :ip => "#{$ip}", :libvirt__dhcp_enabled => false
+  config.vm.synced_folder ".", "/vagrant", disabled: true
+
+  config.vm.provider :libvirt do |libvirt|
+    libvirt.mgmt_attach = false
+    libvirt.qemu_use_agent = true
+  end
+
+  config.vm.define $network_boot_hostname
+end

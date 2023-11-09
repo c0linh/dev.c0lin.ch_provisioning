@@ -1,0 +1,56 @@
+#!/usr/bin/expect
+
+set timeout 300
+spawn telnet 127.0.0.1 2222
+expect "Escape character is '^]'."
+send "\r"
+
+expect "localhost login:"
+send "root\r"
+
+expect "root@localhost*"
+send "apt -q update && apt -qqy upgrade && apt -qqy install qemu-guest-agent\r"
+
+expect "root@localhost*"
+send "echo 'vagrant ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/vagrant\r"
+
+expect "root@localhost*" {
+  send "adduser vagrant\r"
+  expect "New password:"
+  send "vagrant\r"
+  expect "Retype new password:"
+  send "vagrant\r"
+  expect "*Full Name*"
+  send "\r"
+  expect "*Room Number*"
+  send "\r"
+  expect "*Work Phone*"
+  send "\r"
+  expect "*Home Phone*"
+  send "\r"
+  expect "*Other*"
+  send "\r"
+  expect "*Is the information correct?*"
+  send "y\r"
+}
+
+expect "root@localhost*"
+send "sudo -u vagrant -i\r"
+expect "vagrant@localhost*"
+send "mkdir -p /home/vagrant/.ssh && chmod 0700 /home/vagrant/.ssh\r"
+expect "vagrant@localhost*"
+send "wget --no-check-certificate https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub \
+           -O /home/vagrant/.ssh/authorized_keys\r"
+expect "vagrant@localhost*"
+send "chmod 0600 /home/vagrant/.ssh/authorized_keys\r"
+expect "vagrant@localhost*"
+send "exit\r"
+
+expect "root@localhost*"
+send "echo -e 'PubKeyAuthentication yes\nAuthorizedKeysFile %h/.ssh/authorized_keys\nPermitRootLogin no\nPermitEmptyPasswords no\nPasswordAuthentication no\n' >> /etc/ssh/sshd_config\r"
+expect "root@localhost*"
+send "ssh-keygen -A\r"
+expect "root@localhost*"
+send "service ssh restart\r"
+exit
+EOFcd ..
