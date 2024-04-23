@@ -1,3 +1,3 @@
 Introduction
 ============
-development envirnment for a container based media server
+Development environment for a container-based media server.
