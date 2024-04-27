@@ -1,0 +1,35 @@
+- name: Install packages
+  ansible.builtin.apt:
+    cache_valid_time: 43200
+    pkg:
+      - apt-cacher-ng
+
+- name: Ensure fire permissions
+  ansible.builtin.file:
+    path: /var/cache/apt-cacher-ng
+    owner: apt-cacher-ng
+    group: apt-cacher-ng
+    mode: "0755"
+    state: directory
+
+- name: Start Apt-Cacher service
+  ansible.builtin.systemd:
+    name: apt-cacher-ng
+    state: started
+
+#to support mdns with avahi
+- name: Allow Apt-Cacher traffic
+  community.general.ufw:
+    direction: in
+    rule: allow
+    to_port: 3142
+    proto: "tcp"
+  notify: Reload ufw
+
+- name: Set admin credentials
+  ansible.builtin.lineinfile:
+    path: /etc/apt-cacher-ng/security.conf
+    create: true
+    mode: 0600
+    regexp: "^#?AdminAuth:"
+    line: "AdminAuth: admin: {{ lookup('community.general.passwordstore', 'ansible/{{inventory_hostname_short}}/apt-cacher-ng', create=true) }}"

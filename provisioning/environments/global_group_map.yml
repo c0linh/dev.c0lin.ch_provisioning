@@ -1,11 +1,3 @@
-server_vm:
+apt_proxy:
   children:
-    mediacenter:
-    userhome:
-#jumphost
-
-gui:
-  children:
-    mediacenter:
-#desktop
-#laptop
+    repo:

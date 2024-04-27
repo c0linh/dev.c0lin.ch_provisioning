@@ -1,21 +1,31 @@
 - name: Install ufw
   ansible.builtin.apt:
+    cache_valid_time: "43200"
     pkg:
       - ufw
+
+# - name: Set default outgoing policies
+#   community.general.ufw:
+#     direction: outgoing
+#     policy: allow
+#   when: "not done"
+#   vars:
+#     done: "{{ ansible_local.ufw.policy.replaced | default(false) }}"
+
+- name: Set default incomming policies
+  community.general.ufw:
+    direction: incoming
+    policy: deny
+  when: "not done"
+  vars:
+    done: "{{ ansible_local.ufw.policy.replaced | default(false) }}"
+  notify:
+    - Ufw policy set
+    - Reload ufw
 
 #TODO May restrict?
 - name: Allow SSH
   community.general.ufw:
     rule: allow
     name: OpenSSH
-
-- name: Allow outgoing traffic
-  community.general.ufw:
-    direction: outgoing
-    policy: allow
-
-- name: Enable ufw with default deny policy
-  community.general.ufw:
-    state: enabled
-    policy: deny
-    logging: 'on'
+  notify: Reload ufw

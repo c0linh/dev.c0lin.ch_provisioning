@@ -5,5 +5,9 @@
 !.vscode/launch.json
 !.vscode/extensions.json
 
+*.drawio
 .vagrant
 *.qcow2
+*.qcow2.work
+*.box
+.ruby-lsp

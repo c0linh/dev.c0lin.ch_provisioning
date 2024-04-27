@@ -1,5 +1,6 @@
 - name: Install podman and dependencies for rootless usage
   ansible.builtin.apt:
+    cache_valid_time: "43200"
     pkg:
       - fuse-overlayfs
       - slirp4netns

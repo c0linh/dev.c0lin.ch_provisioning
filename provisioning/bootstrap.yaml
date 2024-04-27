@@ -1,0 +1,12 @@
+- name: Bootstrap new ansible host - add user ssh and stuff
+  hosts: "{{ target }}"
+  gather_facts: no
+  become: true
+  become_user: root
+  vars_prompt:
+   - name: target
+     prompt: "Enter node server(s) (separate by ',')"
+     private: no
+
+  roles:
+   - bootstrap

@@ -1,0 +1,13 @@
+/etc/avahi/avahi-daemon.conf
+[server]
+deny-interfaces=lo,::1
+domain-name=dev.c0lin.local
+browse-domains=dev.c0lin.local, home.c0lin.ch
+disallow-other-stacks=yes
+enable-dbus=warnq
+[publish]
+publish-hinfo=no
+publish-workstation=yes
+publish-domain=yes
+publish-aaaa-on-ipv4=no
+#publish-a-on-ipv6=no

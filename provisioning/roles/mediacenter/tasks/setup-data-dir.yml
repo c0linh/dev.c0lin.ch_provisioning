@@ -22,9 +22,10 @@
 
 - name: Install ACL
   ansible.builtin.apt:
+    cache_valid_time: "43200"
     pkg: acl
 
-- name: Set ACL data-group permissions to rw 
+- name: Set ACL data-group permissions to rw
   ansible.posix.acl:
     path: /data/
     etype: group

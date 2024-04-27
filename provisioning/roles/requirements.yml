@@ -1,2 +1,7 @@
 roles:
- - name: hifis.unattended_upgrades
+  - name: hifis.unattended_upgrades
+#collections:
+# - name: community.general
+# https://docs.ansible.com/ansible/latest/collections/ansible/posix/authorized_key_module.html
+#- ansible.posix
+#task: ansible.posix.authorized_key

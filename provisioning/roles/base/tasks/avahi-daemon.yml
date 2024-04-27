@@ -1,0 +1,43 @@
+- name: Install Avahi-Daemon
+  ansible.builtin.apt:
+    cache_valid_time: 43200
+    pkg:
+      - avahi-daemon
+
+- name: Change Avahi-Deamon configuration
+  ansible.builtin.lineinfile:
+    path: /etc/avahi/avahi-daemon.conf
+    regexp: "^#?{{ item['name'] }}"
+    line: "{{ item['name'] }}={{ item['value'] }}"
+  loop:
+    - name: "deny-interfaces"
+      value: "lo,::1"
+    - name: "domain-name"
+      value: "{{ domain }}"
+    - name: "browse-domains"
+      value: "{{ domain }}"
+    - name: "disallow-other-stacks"
+      value: "yes"
+    - name: "enable-dbus"
+      value: "warn"
+    - name: "publish-hinfo"
+      value: "no"
+    - name: "publish-workstation"
+      value: "yes"
+    - name: "publish-domain"
+      value: "{{ domain }}"
+    - name: "publish-aaaa-on-ipv4"
+      value: "no"
+    - name: "publish-a-on-ipv6"
+      value: "no"
+    - name: "Not supported"
+      value: "no"
+  notify: Restart Avahi-Daemon
+
+- name: Allow mDNS traffic
+  community.general.ufw:
+    rule: allow
+    direction: in
+    to_port: 5353
+    proto: "udp"
+  notify: Reload ufw

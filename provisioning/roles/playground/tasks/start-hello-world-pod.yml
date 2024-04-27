@@ -20,7 +20,7 @@
   become: true
   environment:
     XDG_RUNTIME_DIR: "/run/user/1001"
-  systemd:
+  ansible.builtin.systemd:
     name: "container-hello-world"
     scope: "user"
     daemon_reload: "{{ systemd_daemon_reload }}"

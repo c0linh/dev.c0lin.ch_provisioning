@@ -1,0 +1,33 @@
+- name: Install virtualisation libs
+  ansible.builtin.apt:
+    cache_valid_time: "43200"
+    pkg:
+      - qemu-efi
+      - qemu-guest-agent
+      - libvirt-clients-qemu
+      - libvirt-clients
+      - libvirt-daemon-config-network
+      - libvirt-daemon-config-nwfilter
+      - libvirt-daemon-driver-qemu
+
+      - libvirt-daemon-system-systemd
+      - libvirt-daemon-system
+      - libvirt-daemon
+      - libvirt-dev
+      - python3-libvirt
+      - qemu-system-common
+      - qemu-system-data
+      - qemu-system-x86
+      - qemu-system-aarch64
+      - qemu-utils
+      - ruby-libvirt
+      - virtinst
+      - libguestfs-tools
+      - vagrant
+      - ansible
+      - ansible-lint
+      - ruby-libvirt
+#    - spice-vdagent
+#    - xserver-xorg-video-qxl
+#     - libvirt-daemon-system-sysv
+# vagrant plugin install vagrant-libvirt vagrant-host-shell

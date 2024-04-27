@@ -1,5 +1,6 @@
 - name: Upgrade all packages
   ansible.builtin.apt:
-    name: "*"
-    state: latest
-    update_cache: true
+    cache_valid_time: 43200
+    upgrade: yes
+    update_cache_retries: 1
+    lock_timeout: 5

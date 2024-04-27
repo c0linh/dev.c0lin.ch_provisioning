@@ -1,0 +1,2 @@
+- name: STAGE - Setup controller
+  ansible.builtin.import_tasks: apt-install-virualization.yml

@@ -1,4 +1,3 @@
-
 - name: Create registry directory
   ansible.builtin.file:
     path: /home/podman/registry
@@ -18,7 +17,7 @@
   notify: Restart podman
 
 - name: Flush handlers
-  meta: flush_handlers
+  ansible.builtin.meta: flush_handlers
 
 - name: Create registry container
   become_user: podman

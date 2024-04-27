@@ -1,9 +1,10 @@
 - name: Install git
   ansible.builtin.apt:
+    cache_valid_time: "43200"
     pkg:
       - git
 
-- name: Clone content and config
+- name: Clone content and config  # noqa git-latest
   ansible.builtin.git:
     repo: https://github.com/c0linh/nginx-proxy.git
     dest: /home/podman/container/nginx-proxy
@@ -30,12 +31,12 @@
       restart_policy: always
       names: true
 
-- name: Enable and start service for nginx-proxy container 
+- name: Enable and start service for nginx-proxy container
   become_user: "podman"
   become: true
   environment:
     XDG_RUNTIME_DIR: "/run/user/1001"
-  systemd:
+  ansible.builtin.systemd:
     name: "container-nginx-proxy"
     scope: "user"
     daemon_reload: "{{ systemd_daemon_reload }}"

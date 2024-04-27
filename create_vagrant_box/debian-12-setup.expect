@@ -1,9 +1,14 @@
 #!/usr/bin/expect
-
+#
+#https://developer.hashicorp.com/vagrant/docs/boxes/base
+#
 set timeout 300
 spawn telnet 127.0.0.1 2222
 expect "Escape character is '^]'."
 send "\r"
+
+expect "GNU GRUB"
+send "\n"
 
 expect "localhost login:"
 send "root\r"

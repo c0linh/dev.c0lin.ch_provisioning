@@ -1,0 +1,4 @@
+development-stage1 ansible_host=development-stage1 ansible_port=22 ansible_user='vagrant' ansible_ssh_private_key_file='.vagrant/machines/development-stage/libvirt/private_key'
+
+[development-stage]
+development-stage1

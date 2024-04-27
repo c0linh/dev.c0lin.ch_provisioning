@@ -1,0 +1,4 @@
+- name: Read a file from pass file
+  ansible.builtin.shell: |
+    pass file cat ansible/{inventory_hostname_short}/{filename}
+  register: "{inventory_hostname_short}_{filename}"

@@ -1,0 +1,28 @@
+- name: Configure Apt no-install-recommends
+  ansible.builtin.lineinfile:
+    path: /etc/apt/apt.conf.d/98-no-recommends.conf
+    regexp: "^#?APT::Install-Recommends"
+    line: "APT::Install-Recommends \"0\";"
+    mode: "0644"
+    create: yes
+
+- name: Configure apt proxy
+  ansible.builtin.lineinfile:
+    path: /etc/apt/apt.conf.d/4132-apt-proxy.conf
+    regexp: "^Acquire::http::Proxy "
+    line: "Acquire::http::Proxy \"http://{{ groups['apt_proxy'][0] }}:3142\";"
+    mode: "0644"
+    create: yes
+  when: "'apt_proxy' not in group_names"
+
+- name: Set sources.list default
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list
+    mode: "0644"
+    backup: yes
+    content: |
+      deb http://security.debian.org/debian-security bookworm-security main contrib non-free-firmware non-free
+      deb http://mirror.init7.net/debian/ bookworm main contrib non-free-firmware non-free
+      deb http://mirror.init7.net/debian/ bookworm-updates main contrib non-free-firmware non-free
+      deb http://mirror.init7.net/debian/ bookworm-backports main contrib non-free-firmware contrib non-free
+  notify: Apt Update

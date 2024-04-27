@@ -1,0 +1,44 @@
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.synced_folder "../../../", "/opt/soruce", disabled: false
+
+  config.vm.provider :libvirt do |prov|
+    prov.cpu_mode="host-passthrough"
+    #gup passthrough? -> https://vagrant-libvirt.github.io/vagrant-libvirt/configuration.html#additional-disks
+    prov.graphics_type="none"
+    prov.video_type="vga"
+    prov.storage_pool_name = "pool"
+    prov.memory = 8196
+    #
+    prov.cpus = 6
+    prov.keymap = "ch-de"
+  end
+
+#    :libvirt__network_name => "vagrant-development-stage"
+
+  # config.vm.network :private_network do |n|
+  #   n.libvirt__host_ip => "192.168.127.2"
+  #   n.libvirt__network_name => "vagrant-development-stage"
+  #   n.libvirt__domain_name => "development-stage.local"
+  #   n.libvirt__forward_mode => "nat"
+  #   n.libvirt__always_destroy => "false"
+  #   n.mode => "NAT"
+  #   n.type => "bridge"
+
+  config.vm.define "development-stage1.development.local" do |dev|
+    dev.vm.hostname = "development-stage1.development.local"
+    dev.vm.box = "debian/bookworm64"
+    # dev.vm.box = "debian-sid-box"
+  end
+
+  config.vm.provision "ansible" do |ansible|
+    ansible.galaxy_roles_path = "../../.vagrant/galaxy-roles"
+    ansible.config_file = "../../ansible.cfg"
+    ansible.playbook = "../playbook.yml"
+    ansible.inventory_path = "."
+    ansible.galaxy_role_file = "../roles/requirements.yml"
+    ansible.limit = "all"
+  end
+end

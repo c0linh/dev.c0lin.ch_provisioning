@@ -1,7 +1,26 @@
+- name: Apt Update
+  ansible.builtin.apt:
+    update_cache: true
+
 - name: Generate locales
-  ansible.builtin.shell: locale-gen
+  ansible.builtin.command: locale-gen
 
 - name: Restart keyboard service
   ansible.builtin.systemd:
     name: "keyboard-setup"
     state: restarted
+
+- name: Restart Avahi-Daemon
+  ansible.builtin.systemd:
+    name: "avahi-daemon"
+    state: restarted
+#   notify: Start Avahi-Daemon
+
+# - name: Start Avahi-Daemon
+#   ansible.builtin.systemd:
+#     name: "avahi-daemon"
+#     state: started
+
+- name: Reload ufw
+  community.general.ufw:
+    state: reloaded

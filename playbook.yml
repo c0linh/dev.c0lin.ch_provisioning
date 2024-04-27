@@ -1,0 +1,37 @@
+- name: All machines of home.c0lin.ch
+  become: true
+  hosts: all
+  roles:
+    - { role: base, tags: [ 'setup' ] }
+    - role: hifis.unattended_upgrades
+      tags: [ 'setup' ]
+      unattended_origins_patterns:
+        - 'o=Debian,n=${distro_codename}-security,l=Debian-Security'
+        - 'o=Debian,n=${distro_codename},l=Debian-Security' # security updates
+        - 'o=Debian,n=${distro_codename},l=Debian' # updates including non-security updates
+        - 'o=Debian,n=${distro_codename}-updates,l=Debian' # updates including non-security updates
+
+- name: Setup apt-cacher-ng
+  become: true
+  hosts: apt_proxy
+  roles:
+    - apt-proxy
+    # { role: , tags: [ 'setup', 'service' ] }
+
+- name: Development-state that contains all production relevant virtual machines - based on own box
+  hosts: development-stage
+  roles:
+    - { role: development-stage-setup, tags: [ 'setup' ] }
+  become: true
+
+# - name: DMZ of home.c0lin.ch
+#   hosts: server_vm
+#   roles:
+#     - podman
+#   become: true
+
+# - name: Mediacenter
+#   hosts: mediacenter
+#   roles:
+#     - mediacenter
+#   become: true

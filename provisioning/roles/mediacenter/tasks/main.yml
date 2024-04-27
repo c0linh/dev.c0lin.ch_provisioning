@@ -1,1 +1,2 @@
-- ansible.builtin.import_tasks: setup-data-dir.yml
+- name: Setup Mediacenter
+  ansible.builtin.import_tasks: setup-data-dir.yml

@@ -1,0 +1,10 @@
+---
+
+#LOCAL CONNECTION
+ansible_host: "127.0.0.1"
+ansible_connection: local
+ansible_username: c0lin
+# may works
+ansible_become_user: root
+ansible_become_method: sudo
+ansible_ask_become_pass: true
