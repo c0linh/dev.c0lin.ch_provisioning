@@ -10,4 +10,5 @@
 *.qcow2
 *.qcow2.work
 *.box
+*.img
 .ruby-lsp
