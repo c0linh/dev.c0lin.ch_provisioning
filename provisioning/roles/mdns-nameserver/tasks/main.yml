@@ -1,0 +1,7 @@
+- name: Install and configure Bind for Zone Updates
+  ansible.builtin.import_tasks: bind.yml
+  when: "'service_nameserver' in group_names"
+
+- name: Configure other Hosts to perform Zone Updates with there SRV/mDNS records
+  ansible.builtin.import_tasks: zone-update.yml
+  when: "'service_nameserver' not in group_names"

@@ -1,12 +1,12 @@
-mediacenter ansible_host=mediacenter.dev.c0lin.local ansible_user='vagrant' ansible_ssh_private_key_file='.vagrant/machines/mediacenter/libvirt/private_key'
-controller ansible_host=controller.dev.c0lin.local ansible_user='vagrant' ansible_ssh_private_key_file='.vagrant/machines/controller/libvirt/private_key'
-repo ansible_host=repo.dev.c0lin.local ansible_user='vagrant' ansible_ssh_private_key_file='.vagrant/machines/repo/libvirt/private_key'
+cacheproxy1 ansible_host=cacheproxy1.dev.c0lin.local
+controller1 ansible_host=controller1.dev.c0lin.local
+mediacenter1 ansible_host=mediacenter1.dev.c0lin.local
 
-[controller]
-controller
+[hypervisor]
+controller1
 
 [mediacenter]
-mediacenter
+mediacenter1
 
-[repo]
-repo
+[cache_proxy]
+cacheproxy1

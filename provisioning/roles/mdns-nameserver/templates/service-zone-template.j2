@@ -1,0 +1,23 @@
+$TTL 3600 ; One hour default TTL
+
+@ IN SOA {{ ansible_hostname }}.{{ domain }}. unused-email (
+                                1          ; serial
+                                10800      ; refresh (3 hours)
+                                3600       ; retry   (1 hour)
+                                604800     ; expire  (1 week)
+                                60         ; minimum (1 minute)
+                                )
+
+; Specify your server as the nameserver for your zone,
+; substituting your machine's hostname.
+@ IN NS {{ ansible_hostname }}.{{ domain }}.
+
+; Specify the server which handles DNS updates for your zone,
+; typically port 53 on the same server as above.
+; If you're going to be running dnsextd (see below) then the port number is typically 5352
+_dns-update._udp IN SRV 0 0 53 {{ ansible_hostname }}.{{ domain }}.
+
+; Add PTR records telling clients that they can browse and register here
+b._dns-sd._udp  IN PTR @   ;  "b" = browse domain
+lb._dns-sd._udp IN PTR @   ; "lb" = legacy browse domain (include domain in empty-string browses)
+r._dns-sd._udp  IN PTR @   ;  "r" = registration domain

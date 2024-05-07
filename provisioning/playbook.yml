@@ -1,0 +1,66 @@
+- name: Setup
+  become: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Load SSH Keys
+      delegate_to: localhost
+      ansible.builtin.command: |
+        ./load-all-ssh-keys.sh
+      changed_when: false
+      when: setup_ssh_keys
+
+# Early apt cache setup to provide cache to all hosts during there setup
+- name: Setup Apt-Proxy (apt-cacher-ng)
+  become: true
+  hosts: service_apt_proxy
+  tags: [ 'setup' ]
+  roles:
+    - base
+    - apt-proxy
+
+# Early apt cache setup to provide cache to all hosts during there setup
+- name: Setup Apt-Proxy (apt-cacher-ng)
+  become: true
+  hosts: service_nameserver
+  tags: [ 'setup' ]
+  roles:
+    - base
+    - mdns-nameserver
+
+- name: All machines of home.c0lin.ch
+  become: true
+  hosts: all
+  tags: [ 'setup' ]
+  vars_prompt:
+    - name: user_password
+      prompt: "c0lin's password on all ohter hosts?"
+      private: true
+      encrypt: sha512_crypt
+      confirm: true
+      salt_size: 7
+      default: $y$j9T$BAKlTn4LHTn.vbV.bxhpm0$bho3vfbluVaxbQZqxdjFKuXvpth.osp3JOhQfnz4pu5
+  roles:
+    - apt-proxy # To ensure that all hosts use local apt cache during setup
+    - base
+    - role: hifis.unattended_upgrades
+      unattended_origins_patterns:
+        - 'o=Debian,n=${distro_codename}-security,l=Debian-Security'
+        - 'o=Debian,n=${distro_codename},l=Debian-Security' # security updates
+        - 'o=Debian,n=${distro_codename},l=Debian' # updates including non-security updates
+        - 'o=Debian,n=${distro_codename}-updates,l=Debian' # updates including non-security updates
+    - { role: mdns-nameserver }
+    - { role: customize, tags: [ 'customize' ] }
+
+
+- name: Cleanup
+  become: false
+  hosts: 127.0.0.1
+  connection: local
+  tasks:
+    - name: Delete SSH Keys
+      delegate_to: localhost
+      ansible.builtin.command: |
+        ./remove-all-ssh-keys.sh
+      changed_when: false
+      when: setup_ssh_keys

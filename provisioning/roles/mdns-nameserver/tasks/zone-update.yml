@@ -1,0 +1,6 @@
+# Install and configure Bind to serve mDNS Service Records to other network-zones
+- name: Install Bind
+  ansible.builtin.apt:
+    cache_valid_time: 43200
+    pkg:
+      - dnsutils

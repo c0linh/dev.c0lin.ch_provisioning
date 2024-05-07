@@ -1,61 +1,64 @@
-#!/usr/bin/expect
-#
-#https://developer.hashicorp.com/vagrant/docs/boxes/base
-#
-set timeout 300
-spawn telnet 127.0.0.1 2222
-expect "Escape character is '^]'."
-send "\r"
+/var/etc/dnsmasq.conf.cfg01411c: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host 
+       valid_lft forever preferred_lft forever
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel state UP qlen 1000
+    link/ether c0:c1:c0:af:8f:b9 brd ff:ff:ff:ff:ff:ff
+    inet6 fe80::c2c1:c0ff:feaf:8fb9/64 scope link 
+       valid_lft forever preferred_lft forever
+5: wlan1: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN qlen 1000
+    link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
+6: br-lan: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP qlen 1000
+    link/ether c0:c1:c0:af:8f:b9 brd ff:ff:ff:ff:ff:ff
+ ->  inet 192.168.2.1/24 brd 192.168.2.255 scope global br-lan
+ ¢      valid_lft forever preferred_lft forever
+ |   inet6 2a02:1210:440f:8e80::1/60 scope global dynamic noprefixroute 
+       valid_lft 20090sec preferred_lft 5690sec
+    inet6 fd3e:3250:7010::1/60 scope global noprefixroute 
+ |      valid_lft forever preferred_lft forever
+    inet6 fe80::c2c1:c0ff:feaf:8fb9/64 scope link 
+       valid_lft forever preferred_lft forever
+97 phy0-ap0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN qlen 1000
+    link/ether 00:00:00:00:00:00 brd ff:ff:ff:ff:ff:ff
+| eth0.1@eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue master br-lan state UP qlen 1000
+ ->   link/ether c0:c1:c0:af:8f:b9 brd ff:ff:ff:ff:ff:ff
 
-expect "GNU GRUB"
-send "\n"
+ 192.168.1.201/32 !=???? 192.168.2.1/24
 
-expect "localhost login:"
-send "root\r"
 
-expect "root@localhost*"
-send "apt -q update && apt -qqy upgrade && apt -qqy install qemu-guest-agent\r"
+11: eth0.2@eth0:  ------>
 
-expect "root@localhost*"
-send "echo 'vagrant ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/vagrant\r"
 
-expect "root@localhost*" {
-  send "adduser vagrant\r"
-  expect "New password:"
-  send "vagrant\r"
-  expect "Retype new password:"
-  send "vagrant\r"
-  expect "*Full Name*"
-  send "\r"
-  expect "*Room Number*"
-  send "\r"
-  expect "*Work Phone*"
-  send "\r"
-  expect "*Home Phone*"
-  send "\r"
-  expect "*Other*"
-  send "\r"
-  expect "*Is the information correct?*"
-  send "y\r"
-}
+    <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc noqueue state UP qlen 1000
+    link/ether c0:c1:c0:af:8f:b9 brd ff:ff:ff:ff:ff:ff
+    inet 192.168.1.201/32 brd 255.255.255.255 scope global eth0.2
+       modt
+       <!-- valid_lft forever preferred_lft forever
+    inet6 2a02:1210:440f:8e00:c2c1:c0ff:feaf:8fb9/64 scope global dynamic noprefixroute 
+       valid_lft 21577sec preferred_lft 7177sec
+    inet6 fe80::c2c1:c0ff:feaf:8fb9/64 scope link 
+       valid_lft forever preferred_lft forever -->
 
-expect "root@localhost*"
-send "sudo -u vagrant -i\r"
-expect "vagrant@localhost*"
-send "mkdir -p /home/vagrant/.ssh && chmod 0700 /home/vagrant/.ssh\r"
-expect "vagrant@localhost*"
-send "wget --no-check-certificate https://raw.github.com/mitchellh/vagrant/master/keys/vagrant.pub \
-           -O /home/vagrant/.ssh/authorized_keys\r"
-expect "vagrant@localhost*"
-send "chmod 0600 /home/vagrant/.ssh/authorized_keys\r"
-expect "vagrant@localhost*"
-send "exit\r"
+       ?!??!?!?!?!?!?
 
-expect "root@localhost*"
-send "echo -e 'PubKeyAuthentication yes\nAuthorizedKeysFile %h/.ssh/authorized_keys\nPermitRootLogin no\nPermitEmptyPasswords no\nPasswordAuthentication no\n' >> /etc/ssh/sshd_config\r"
-expect "root@localhost*"
-send "ssh-keygen -A\r"
-expect "root@localhost*"
-send "service ssh restart\r"
-exit
-EOFcd ..
+
+       WAN +accept forward....
+
+
+# /etc/config/firewall
+uci set firewall.cfg03dc81.forward='ACCEPT'
+# /etc/config/network
+uci add network device # =cfg0c0f15
+uci set network.@device[-1].name='eth0.1'
+uci set network.@device[-1].type='8021q'
+uci set network.@device[-1].ifname='eth0'
+uci set network.@device[-1].vid='1'
+i
+
+
+yProt spezifisch? y pm.x addr frtm 1 net (viv)
+
+
+route

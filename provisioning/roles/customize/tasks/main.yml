@@ -1,0 +1,3 @@
+- name: Create user
+  ansible.builtin.import_tasks: add-user.yml
+  when: create_user is defined and create_user

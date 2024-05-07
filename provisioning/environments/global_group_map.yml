@@ -1,3 +1,7 @@
-apt_proxy:
+service_apt_proxy:
   children:
-    repo:
+    cache_proxy:
+
+service_nameserver:
+  children:
+    cache_proxy:

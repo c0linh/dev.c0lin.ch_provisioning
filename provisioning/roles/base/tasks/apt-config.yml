@@ -6,15 +6,6 @@
     mode: "0644"
     create: yes
 
-- name: Configure apt proxy
-  ansible.builtin.lineinfile:
-    path: /etc/apt/apt.conf.d/4132-apt-proxy.conf
-    regexp: "^Acquire::http::Proxy "
-    line: "Acquire::http::Proxy \"http://{{ groups['apt_proxy'][0] }}:3142\";"
-    mode: "0644"
-    create: yes
-  when: "'apt_proxy' not in group_names"
-
 - name: Set sources.list default
   ansible.builtin.copy:
     dest: /etc/apt/sources.list
@@ -25,4 +16,20 @@
       deb http://mirror.init7.net/debian/ bookworm main contrib non-free-firmware non-free
       deb http://mirror.init7.net/debian/ bookworm-updates main contrib non-free-firmware non-free
       deb http://mirror.init7.net/debian/ bookworm-backports main contrib non-free-firmware contrib non-free
-  notify: Apt Update
+  when: "'Debian' == ansible_distribution and 'bookworm' == ansible_distribution_release"
+
+- name: Set sources.list osmc
+  ansible.builtin.copy:
+    dest: /etc/apt/sources.list
+    mode: "0644"
+    backup: yes
+    content: |
+      deb http://mirror.init7.net/debian bullseye main contrib non-free
+      deb http://mirror.init7.net/debian/ bullseye-updates main contrib non-free
+      deb http://security.debian.org/ bullseye-security main contrib non-free
+      deb http://apt.osmc.tv bullseye main
+  when: "'mediacenter' in groups and 'OSMC' == ansible_distribution"
+
+- name: Update Apt cache
+  ansible.builtin.apt:
+    update_cache: true

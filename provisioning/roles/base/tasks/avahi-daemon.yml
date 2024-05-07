@@ -25,13 +25,13 @@
     - name: "publish-workstation"
       value: "yes"
     - name: "publish-domain"
-      value: "{{ domain }}"
+      value: "yes"
     - name: "publish-aaaa-on-ipv4"
       value: "no"
     - name: "publish-a-on-ipv6"
       value: "no"
-    - name: "Not supported"
-      value: "no"
+    - name: "enable-wide-area"
+      value: "yes"
   notify: Restart Avahi-Daemon
 
 - name: Allow mDNS traffic

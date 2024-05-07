@@ -1,4 +1,5 @@
 # IDE - VSCode
+.ssh
 .vscode/*
 !.vscode/settings.json
 !.vscode/tasks.json

@@ -1,0 +1,90 @@
+- name: Install setfacl to enable become with unpriviliged users
+  ansible.builtin.apt:
+    package:
+      - acl
+
+- name: Ensure "sudo" group exists
+  ansible.builtin.group:
+    name: sudo
+
+- name: Ensure "sudo" group can use sudo
+  ansible.builtin.lineinfile:
+    path: /etc/sudoers
+    regexp: "^%sudo"
+    line: "%sudo ALL=(ALL:ALL) ALL"
+    validate: /usr/sbin/visudo -cf %s
+
+- name: Set user variables
+  ansible.builtin.set_fact:
+    username: c0lin
+
+- name: Add user with sudo group
+  ansible.builtin.user:
+    name: "{{ username }}"
+    home: "/home/{{ username }}"
+    groups: sudo
+    password: "{{ user_password }}" #Prompt/defined in Play
+  register: user_response
+
+- name: Set ssh convenience variables
+  ansible.builtin.set_fact:
+    ssh_tmp_file: "tmpsshid_{{ inventory_hostname_short }}"
+    pass_store_key: "{{ domain }}/{{ inventory_hostname_short }}"
+    pass_store_file: "~/.password-store/{{ domain }}/{{ inventory_hostname_short }}/{{ username }}_id.b64"
+
+- name: Generate Key and save in Password Manager
+  when: user_response is changed or overwrite_user_key is defined and overwrite_user_key # noqa: no-handler
+  block:
+    - name: Generate OpenSSH keypair
+      delegate_to: localhost
+      become: true
+      become_method: runas
+      become_user: "{{ lookup('ansible.builtin.env', 'USER') }}"
+      ansible.builtin.command: |
+        ssh-keygen -C {{ username }}@{{ inventory_hostname_short }} -N {{ passphrase }} -t ed25519 -f {{ ssh_tmp_file }}
+      vars:
+        passphrase: '{{ lookup("community.general.passwordstore", "{{ pass_store_key }}/{{ username }}_passphrase", create=true, overwrite=true) }}'
+      register: keygen_response
+      changed_when: keygen_response.rc == 0
+      failed_when: keygen_response.rc != 0
+
+    - name: "Create authorized_keys file"
+      become: true
+      become_user: root
+      become_method: sudo
+      ansible.posix.authorized_key:
+        user: "{{ username }}"
+        key: "{{ lookup('file', ssh_tmp_file + '.pub') }}"
+        exclusive: true
+
+    - name: Ensure .ssh permissions
+      become: true
+      become_user: "{{ username }}"
+      become_method: runas
+      ansible.builtin.file:
+        path: "/home/{{ username }}/.ssh"
+        state: directory
+        mode: "0700"
+
+    - name: Save private-key file to pass
+      delegate_to: localhost
+      become: false
+      ansible.builtin.shell: |
+        [ -f "{{ pass_store_file }}" ] &&
+          pass rm "{{ pass_store_file }}"
+        pass file add "{{ pass_store_key }}/{{ username }}_id" {{ ssh_tmp_file }}
+      register: pass_save_key_response
+      changed_when: pass_save_key_response.rc == 0
+      failed_when: pass_save_key_response.rc != 0
+  always:
+    - name: Delete OpenSSH keypair
+      delegate_to: localhost
+      become: true
+      become_method: runas
+      become_user: "{{ lookup('ansible.builtin.env', 'USER') }}"
+      ansible.builtin.file:
+        state: absent
+        path: "{{ item }}"
+      loop:
+        - "{{ ssh_tmp_file }}"
+        - "{{ ssh_tmp_file }}.pub"

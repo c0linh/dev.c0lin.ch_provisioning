@@ -1,0 +1,21 @@
+
+    # { role: , tags: [ 'setup', 'service' ] }
+
+# - name: DMZ of home.c0lin.ch
+#   hosts: server_vm
+#   roles:
+#     - podman
+#   become: true
+# - name: Mediacenter
+#   hosts: mediacenter
+#   roles:
+#     - mediacenter
+#   become: true
+#
+# router
+# ansible_facts['distribution'] == "OpenWrt"
+- name: Development-state that contains all production relevant virtual machines - based on own box
+  hosts: development-stage
+  roles:
+    - { role: development-stage-setup, tags: [ 'setup' ] }
+  become: true

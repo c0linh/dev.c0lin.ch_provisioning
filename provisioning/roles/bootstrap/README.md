@@ -51,8 +51,7 @@ If you wish to use a different user, specify it with `-u`:
 If you wish to use a different user and have SSH key-based access, omit
 `--ask-pass`:
 ```
-  ansible-playbook bootstrap.yaml -u USERNAME \
-    -e target=EXAMPLE.DOMAIN --ask-become-pass
+  clear
 ```
 
 If the system does not have sudo installed (e.g. Debian 10 out of the box),

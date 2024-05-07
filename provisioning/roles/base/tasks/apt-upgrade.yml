@@ -1,6 +1,9 @@
 - name: Upgrade all packages
   ansible.builtin.apt:
     cache_valid_time: 43200
-    upgrade: yes
+    upgrade: "{{ upgrade }}"
     update_cache_retries: 1
     lock_timeout: 5
+  vars:
+    # osmc disables upgrade in favore of dist-upgrade
+    upgrade: "{{ 'dist' if ansible_distribution == 'OSMC' else 'yes' }}"

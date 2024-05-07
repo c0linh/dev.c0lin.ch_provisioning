@@ -14,16 +14,16 @@
 #     validate: /usr/sbin/visudo -cf %s
 #   when: ansible_connection != "local"
 
-- name: explicitly gather facts
-  setup:
+- name: Explicitly gather facts
+  ansible.builtin.setup:
 
 # NOTE: It seems weird to run this so late, since other things have assumed
 # NOTE: that sudo exists.  However, if this matters (i.e. sudo is not
 # NOTE: installed), then the user MUST specify a become_method on the command
 # NOTE: line for this role to work at all, so it doesn't really matter when
 # NOTE: this particular task is run.
-- name: install sudo and acl
-  apt:
+- name: Install sudo and acl
+  ansible.builtin.apt:
     name:
       - sudo
       - acl
@@ -31,8 +31,8 @@
     cache_valid_time: 3600
     force_apt_get: yes
 
-- name: allow ansible user to have passwordless sudo
-  lineinfile:
+- name: Allow ansible user to have passwordless sudo
+  ansible.builtin.lineinfile:
     path: /etc/sudoers.d/ansible
     regexp: "^ansible "
     line: "ansible ALL=(ALL) NOPASSWD: ALL"
@@ -41,59 +41,71 @@
     create: yes
     validate: /usr/sbin/visudo -cf %s
 
-- name: add ansible user and set groups
-  user:
+- name: Add ansible user and set groups
+  ansible.builtin.user:
     name: ansible
-    # On RedHat systems, we put the ansible user in the wheel group to
-    # work-around cPanel's open file limit of 100.  Mitogen uses file
-    # descriptors 100 and 101 for internal purposes.  See:
-    # https://github.com/dw/mitogen/issues/644
     home: "/home/ansible"
 
-- name: Generate an OpenSSH keypair
-  delegate_to: localhost
-  become: true
-  become_method: runas
-  become_user: "{{ lookup('ansible.builtin.env', 'USER' }}"
-  community.crypto.openssh_keypair: # returns "public_key"
-    type: ed25519
-    path: id_ssh_ed25519
-    passphrase: "{{ passphrase }}"
-    #using ansible_host because the ssh-key for the ansible user is directly tied to the machine, not to the inventory_name
-  vars:
-    passphrase: '{{ lookup(''community.general.passwordstore'',"ansible/{{inventory_hostname_short}}/passphrase", create=true) }}'
+- name: Generate Key for ansible and store in Password Manager
+  block:
+    - name: Generate an OpenSSH keypair
+      delegate_to: localhost
+      become: false
+      # become_method: runas
+      # become_user: "{{ lookup('ansible.builtin.env', 'USER') }}"
+      ansible.builtin.command: ssh-keygen -C ansible@{{ inventory_hostname_short }} -N {{ passphrase }} -t ed25519 -f tmpsshid
+      vars:
+        passphrase: '{{ lookup("community.general.passwordstore", "ansible/{{inventory_hostname_short}}/passphrase", create=true) }}'
 
-- name: create ansible's authorized_keys
-  become: true
-  become_user: "{{ 'root' if ansible_check_mode else 'ansible' }}"
-  authorized_key:
-    user: ansible
-    path: "/home/ansible/.ssh/authorized_keys"
-    key: "{{ lookup('file', 'id_ssh_ed25519.pub') }}"
-    exclusive: yes
+    # - name: Delete old authorized_keys file
+    #   become: true
+    #   become_user: ansible
+    #   become_method: runas
+    #   ansible.builtin.file:
+    #     state: absent
+    #     path: /home/ansible/.ssh/authorized_keys
 
-# This must be after setting up passwordless sudo and the authorized_keys.
-- name: remove ansible's password
-  user:
-    name: ansible
-    password: "*"
+    - name: Create ansible's authorized_keys file
+      become: true
+      become_user: root
+      become_method: sudo
+      ansible.posix.authorized_key:
+        user: ansible
+        key: "{{ lookup('file', 'tmpsshid.pub') }}"
+        exclusive: true
 
-- name: Save private-key file th pass
-  delegate_to: localhost
-  become: true
-  become_method: runas
-  become_user: "{{ lookup('ansible.builtin.env', 'USER' }}"
-  ansible.builtin.shell: |
-    pass file add "ansible/{{inventory_hostname_short}}/id_ssh_ed25519" "{{ lookup('file', 'id_ssh_ed25519') }}"
-    exit 0
+    - name: Ensure .ssh permissions
+      become: true
+      become_user: ansible
+      become_method: runas
+      ansible.builtin.file:
+        path: /home/ansible/.ssh
+        state: directory
+        mode: "0700"
 
-- name: Delete OpenSSH keypair
-  delegate_to: localhost
-  become: true
-  become_method: runas
-  become_user: "{{ lookup('ansible.builtin.env', 'USER' }}"
-  ansible.builtin.file:
-    state: absent
-    path:
-      - "{{ lookup('file', 'id_ssh_ed25519.pub') }}"
-      - "{{ lookup('file', 'id_ssh_ed25519') }}"
+    - name: Save private-key file to pass
+      delegate_to: localhost
+      become: false
+      ansible.builtin.shell: |
+        [ -f "~/.password-store/ansible/{{ inventory_hostname_short }}/ssh_id.b64" ] &&
+          pass rm "ansible/{{ inventory_hostname_short }}/ssh_id.b64"
+        pass file add "ansible/{{ inventory_hostname_short }}/ssh_id" tmpsshid
+      when: True
+
+  always:
+    - name: Remove ansible's password
+      ansible.builtin.user:
+        name: ansible
+        password: "*"
+
+    - name: Delete OpenSSH keypair
+      delegate_to: localhost
+      become: true
+      become_method: runas
+      become_user: "{{ lookup('ansible.builtin.env', 'USER') }}"
+      ansible.builtin.file:
+        state: absent
+        path: "{{ item }}"
+      loop:
+        - "tmpsshid"
+        - "tmpsshid.pub"

@@ -3,24 +3,21 @@
     cache_valid_time: "43200"
     pkg:
       - ufw
+  notify:
+    - Start ufw
 
-# - name: Set default outgoing policies
-#   community.general.ufw:
-#     direction: outgoing
-#     policy: allow
-#   when: "not done"
-#   vars:
-#     done: "{{ ansible_local.ufw.policy.replaced | default(false) }}"
+- name: Set default outgoing policies
+  community.general.ufw:
+    direction: outgoing
+    policy: allow
+  notify:
+    - Reload ufw
 
 - name: Set default incomming policies
   community.general.ufw:
     direction: incoming
     policy: deny
-  when: "not done"
-  vars:
-    done: "{{ ansible_local.ufw.policy.replaced | default(false) }}"
   notify:
-    - Ufw policy set
     - Reload ufw
 
 #TODO May restrict?

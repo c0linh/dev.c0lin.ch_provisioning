@@ -1,7 +1,3 @@
-- name: Apt Update
-  ansible.builtin.apt:
-    update_cache: true
-
 - name: Generate locales
   ansible.builtin.command: locale-gen
 
@@ -14,12 +10,10 @@
   ansible.builtin.systemd:
     name: "avahi-daemon"
     state: restarted
-#   notify: Start Avahi-Daemon
 
-# - name: Start Avahi-Daemon
-#   ansible.builtin.systemd:
-#     name: "avahi-daemon"
-#     state: started
+- name: Start ufw
+  community.general.ufw:
+    state: enabled
 
 - name: Reload ufw
   community.general.ufw:

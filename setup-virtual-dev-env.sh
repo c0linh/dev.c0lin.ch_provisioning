@@ -15,3 +15,6 @@ sudo apt install ansible ansible-lint pass gpg python3-passlib python3-paramiko
 
 sudo apt install vagrant ruby-libvirt
 vagrant plugin install vagrant-libvirt vagrant-host-shell
+
+
+virsh net-create libvirt_network_config.xml

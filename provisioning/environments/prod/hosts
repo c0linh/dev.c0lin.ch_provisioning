@@ -1,24 +1,18 @@
-#asterix.home.c0lin.ch ansible_host=0.0.0.0 ansible_user='vagrant' ansible_ssh_private_key_file='/home/c0lin/code/ansible_network/.vagrant/machines/asterix/libvirt/private_key'
-#dilbert.home.c0lin.ch ansible_host=0.0.0.0 ansible_user='vagrant' ansible_ssh_private_key_file='/home/c0lin/code/ansible_network/.vagrant/machines/dilbert/libvirt/private_key'
-#leonard.home.c0lin.ch ansible_host=192.168.1.104 ansible_user='vagrant' ansible_ssh_private_key_file='/home/c0lin/code/ansible_network/.vagrant/machines/leonard/libvirt/private_key'
-#sheldon.home.c0lin.ch ansible_host=192.168.1.103 ansible_user='vagrant' ansible_ssh_private_key_file={{ lookup(''community.general.passwordstore'',"ansible/{{inventory_hostname_short}}/passphrase", create=false) }}
-garfield.home.c0lin.ch
-cartman.home.c0lin.ch
+garfield
+dilbert
+elmo
 
 [laptop]
-#asterix.home.c0lin.ch
 
 [desktop]
-cartman.home.c0lin.ch
 
 [jumphost]
-#dilbert.home.c0lin.ch
 
-[controller]
-#leonard.home.c0lin.ch
+[hypervisor]
+elmo
 
 [mediacenter]
-#sheldon.c0lin.ch
+dilbert
 
-[repo]
-garfield.home.c0lin.ch
+[cache_proxy]
+garfield

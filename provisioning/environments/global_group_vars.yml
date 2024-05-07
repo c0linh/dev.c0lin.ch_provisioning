@@ -1,4 +1,2 @@
-
 systemd_daemon_reload: false
 podman_recreate_container: false
-#container_data_dir: "/home/podman/container-data"

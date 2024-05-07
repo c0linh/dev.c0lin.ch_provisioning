@@ -16,7 +16,7 @@ Vagrant.configure("2") do |config|
     prov.management_network_keep = "true"
   end
 
-  [ "controller", "mediacenter", "userhome", "repo" ].each { |name|
+  [ "cacheproxy1", "mediacenter1", "controller1" ].each { |name|
     config.vm.define "#{name}" do |dev|
       dev.vm.hostname = "#{name}.#{domain}"
       dev.vm.box = "debian/bookworm64"
@@ -25,10 +25,11 @@ Vagrant.configure("2") do |config|
 
   config.vm.provision "ansible" do |ansible|
     ansible.galaxy_roles_path = ".vagrant/galaxy-roles"
+    ansible.galaxy_role_file = "provisioning/roles/requirements.yml"
     ansible.config_file = "ansible.cfg"
     ansible.playbook = "provisioning/playbook.yml"
     ansible.inventory_path = "provisioning/environments/dev"
-    ansible.galaxy_role_file = "provisioning/roles/requirements.yml"
-    ansible.limit = "all"
+    # ansible.limit = "all"
+    # verbose = true
   end
 end

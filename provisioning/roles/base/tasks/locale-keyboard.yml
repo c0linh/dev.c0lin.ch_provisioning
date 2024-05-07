@@ -13,20 +13,34 @@
       LC_PAPER=de_CH.UTF-8
 
 - name: Set English and swiss-german in locale.gen
-  ansible.builtin.copy:
-    dest: "/etc/locale.gen"
+  ansible.builtin.lineinfile:
     mode: "0644"
-    content: |
-      en_US.UTF-8 UTF-8
-      de_CH.UTF-8 UTF-8
-  notify: Generate locales
+    create: True
+    path: "/etc/locale.gen"
+    regexp: "^#?{{ item }}"
+    line: "{{ item }}"
+  loop:
+    - "en_US.UTF-8 UTF-8"
+    - "de_CH.UTF-8 UTF-8"
 
-- name: Install keyboard related packages
-  ansible.builtin.apt:
-    cache_valid_time: "43200"
-    pkg:
-      - keyboard-configuration
-      - console-setup
+- name: Install console and keyboard packaged
+  block:
+    - name: Install keyboard related packages
+      ansible.builtin.apt:
+        cache_valid_time: "43200"
+        pkg:
+          - keyboard-configuration
+          - console-setup
+  rescue:
+    - name: Wait for apt lock - call sleep - blunt rescue attempt
+      ansible.builtin.command: |
+        sleep 2
+    - name: Install keyboard related packages - with a hammer
+      ansible.builtin.apt:
+        update_cache: true
+        pkg:
+          - keyboard-configuration
+          - console-setup
 
 - name: Set keyboard layout to swiss-german
   ansible.builtin.copy:

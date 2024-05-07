@@ -1,0 +1,23 @@
+- name: Store own IPv4
+  ansible.builtin.set_fact:
+    nameserver_ip: ansible_default_ipv4.network
+
+- name: Is nameserver configured?
+  delegate_to: router
+  ansible.builtin.command:
+    uci show dhcp.Server_Settings.server
+  register: upstream_ns_response
+  failed_when: upstream_ns_response.rc != '0'
+  changed_when: upstream_ns_response.rc == '0'
+
+- name: Add Service Nameserver to Open-Wrt
+  delegate_to: router
+  ansible.builtin.command:
+    uci add_list dhcp.Server_Settings.server='/services.{{ domain }}/{{ nameserver_ip }}'
+    uci add_list dhcp.Server_Settings.ptr-record='db._dns-sd._udp.{{ domain }},services.{{ domain }}'
+    uci add_list dhcp.Server_Settings.ptr-record='dr._dns-sd._udp.{{ domain }},services.{{ domain }}'
+    uci add_list dhcp.Server_Settings.ptr-record='lb._dns-sd._udp.{{ domain }},services.{{ domain }}'
+    uci commit
+  register: upstream_add_ns_response
+  when: upstream_ns.stdout not contains nameserver_ip
+  changed_when: upstream_add_ns_response.rc == '0'

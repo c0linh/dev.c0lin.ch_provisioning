@@ -18,7 +18,7 @@
   ansible.builtin.import_tasks: apt-config.yml
 - name: Locale and Keyboard
   ansible.builtin.import_tasks: locale-keyboard.yml
-- name: Apt Update
+- name: Apt Upgrade
   ansible.builtin.import_tasks: apt-upgrade.yml
 - name: UFW Setup
   ansible.builtin.import_tasks: ufw.yml
